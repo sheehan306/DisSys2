@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Register User</title>
+<link rel="icon" type="image/ico" href="http://www.dit.ie/media/styleimages/dit_crest_2010.gif"/>	    
+<script type="text/javascript" src="js/libs/modernizr-2.5.3.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/mystyle.css">
+
+
+<script type="text/javascript">
+        Modernizr.load([{
+            //Load CDN hosted jQuery or fall back to local file.
+            /*--------Note-----------
+            This approach should only be used if you trust the source of where the resource (JavaScript) is located.
+            In this case, use of the jquery CDN is much faster if your user's browser already has this file cached.
+            If they don't have it cached, try to load it from the CDN as this will be faster if the user is
+            located closer to a CDN than you currently hosted server.
+            */
+            load: [
+                "http://code.jquery.com/jquery-1.7.1.min.js",
+                "js/libs/underscore-min.js",
+                // Minification - See Readme for details
+                // For minification, comment out this file
+                "js/app.js"
+                // For minification, uncomment this file
+                // "js/app.min.js"
+            ],
+            complete: function() {
+                if ( !window.jQuery ) {
+                    //In production, you would want to fall back to a minified file.
+                    //We fall back to the full version because Eclipse reports false errors in some minified JavaScript files.
+                    yepnope( "js/libs/jquery-1.7.1.min.js" );
+                }
+            }
+        },{
+            //device detection and asynchronous script loading
+            /*--------Note-----------
+            Here we're using the yepnope framework which gives us the ability to load scripts dynamically, based on
+            Modernizr's results.
+            With Modernizr, we use media queries and touch detection to see if we are on a mobile, touch based device
+            or if we're at anything less than 480px.. this gives us a mobile ui on desktop browsers when resized to <480px
+            width for testing.
+            */
+            test: Modernizr.mq( "only all and (max-width: 640px)" ),
+            yep: {
+                //assign labeled callbacks for later execution after script loads.
+                //we are on mobile device so load appropriate CSS
+                "jqmcss": "css/jquery.mobile-1.1.0.min.css",
+                // For minification, uncomment this line
+                //"mcss": "css/m.screen.min.css"
+                // For minification, comment out this line
+                "mcss": "css/mystyle.css"
+            },
+            nope: {
+                //we are on desktop
+                // For minification, uncomment this line
+                //"scss": "css/d.screen.min.css"
+                // For minification, comment out this line
+            	"scss": "css/mystyle.css"
+            },
+            callback: {
+                //use the labeled callbacks from above, and load jQuery Mobile
+                "jqmcss": function( url, result, key ) {
+                    yepnope({
+                        load: "http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js",
+                        complete: function() {
+                            if ( !$.mobile ) {
+                                yepnope.injectJs( "js/libs/jquery.mobile-1.1.0.min.js" );
+                            }
+                        }
+                    });
+                },
+                "scss": function( url, result, key ) {
+                    $( document ).ready( function() {
+                        //here we are moving content around based on the browser/device.
+                        $( "aside" ).insertAfter( $( "section" ) );
+                    });
+                }
+            },
+            complete: function() {
+                $( document ).ready( function() {
+                    //setup the app after all scripts have loaded
+
+                    $( "#container" ).show();
+                    //Fetches the initial member data and populates the table using jquery templates
+                    //getMemberTemplate();
+                    //getCdTemplate();
+
+                    //Register an event listener on the sumbit action
+                    $('#reg').submit(function(event) {
+                        event.preventDefault();
+
+                       // var memberData = $(this).serializeObject();
+                       
+                       	var memberData ={
+											"username":document.getElementById("name").value,
+											"password":document.getElementById("password").value };
+											
+											if(document.getElementById("validate-status").innerHTML == "passwords match :)"){
+											registerMember(memberData);
+											}
+                       
+
+                        //registerMember(memberData);
+                    });
+
+                    //Register the cancel listener
+                    $('#cancel').click(function(event) {
+                        //clear input fields
+                        $('#reg')[0].reset();
+
+                        //clear existing msgs
+                        $('span.invalid').remove();
+                        $('span.success').remove();
+                    });
+
+                    $("#refreshButtonD, #refreshButtonM").click(function(event) {
+                        //updateMemberTable();
+                       // updateCdTable();
+                    });
+
+                    //Clear member registration and error messages on page change
+                    $("#container").delegate("#register-art", "pagebeforeshow", function(event) {
+                        $("#formMsgs").empty();
+                        $('span.invalid').remove();
+                    });
+                });
+
+                $.fn.serializeObject = function() {
+                    var o = {};
+                    var a = this.serializeArray();
+                    $.each(a, function() {
+                        if (o[this.name]) {
+                            if (!o[this.name].push) {
+                                o[this.name] = [o[this.name]];
+                            }
+                            o[this.name].push(this.value || '');
+                        } else {
+                            o[this.name] = this.value || '';
+                        }
+                    });
+                    return o;
+                };
+            }
+        }]);
+    </script>
+
+
+</head>
+
+<body>
+	<div id="main-container">
+		
+		<div id="inner-container">
+			<center>
+				<!-- For now mapping bean validation constraints from server side model is a manual task -->
+				<form name="reg" id="reg" data-ajax="false">
+					<fieldset>
+						<legend>Register as a User:</legend>
+						<div>
+							<label for="name">Username:</label> <input type="text"
+								name="name" id="name" placeholder="Username" required autofocus />
+						</div>
+						<br>
+						<div>
+							<label for="password">Password:</label> <input type="password"
+								name="password" id="password" placeholder="User Password"
+								required />
+						</div>
+						<br>
+						<div>
+							<label for="passwordRetype">Re-Enter Password:</label> <input
+								type="password" name="passwordRetype" id="passwordRetype"
+								placeholder="repeat password " required />
+						</div>
+						<br>
+						<p id="validate-status"></p>
+						<br>
+						<div data-role="controlgroup" data-type="horizontal">
+							<input class="button" type="submit" id="register" value="Register" /> 
+							<input class="button" type="button" name="cancel" id="cancel" value="Cancel" />
+							
+						</div>
+						<br>
+						<div id="formMsgs"></div>
+
+					</fieldset>
+				</form>
+				<br>
+				                        <center><a href="index.html"><button class="button" >Return to Login Screen</button></a></center>
+				
+			</center>
+		</div>
+
+
+	</div>
+			<div id="eric-multi">
+			<img src="images/ebottomgrad.jpg">
+		</div>
+</body>
+</html>

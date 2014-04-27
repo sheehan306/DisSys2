@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My To Do List</title>
+<link rel="icon" type="image/ico" href="http://www.dit.ie/media/styleimages/dit_crest_2010.gif"/>	    
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+
+<!-- For minification, comment out this link -->
+<!-- Shared styles -->
+<link rel="stylesheet" href="css/screen.css" />
+<link rel="stylesheet" href="css/mystyle.css" />
+
+<!-- Set viewport scaling and zoom features -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script type="text/javascript" src="js/userPermissions.js"></script>
+<script type="text/javascript" src="js/modal.js"></script>
+<script type="text/javascript" src="js/libs/modernizr-2.5.3.min.js"></script>
+
+<script type="text/javascript">
+	Modernizr
+			.load([
+					{
+						//Load CDN hosted jQuery or fall back to local file.
+						/*--------Note-----------
+						This approach should only be used if you trust the source of where the resource (JavaScript) is located.
+						In this case, use of the jquery CDN is much faster if your user's browser already has this file cached.
+						If they don't have it cached, try to load it from the CDN as this will be faster if the user is
+						located closer to a CDN than you currently hosted server.
+						 */
+						load : [ "http://code.jquery.com/jquery-1.7.1.min.js",
+								"js/libs/underscore-min.js",
+								// Minification - See Readme for details
+								// For minification, comment out this file
+								"js/app.js"
+						// For minification, uncomment this file
+						// "js/app.min.js"
+						],
+						complete : function() {
+							if (!window.jQuery) {
+								//In production, you would want to fall back to a minified file.
+								//We fall back to the full version because Eclipse reports false errors in some minified JavaScript files.
+								yepnope("js/libs/jquery-1.7.1.min.js");
+							}
+						}
+					},
+					{
+						//device detection and asynchronous script loading
+						/*--------Note-----------
+						Here we're using the yepnope framework which gives us the ability to load scripts dynamically, based on
+						Modernizr's results.
+						With Modernizr, we use media queries and touch detection to see if we are on a mobile, touch based device
+						or if we're at anything less than 480px.. this gives us a mobile ui on desktop browsers when resized to <480px
+						width for testing.
+						 */
+						test : Modernizr.mq("only all and (max-width: 640px)"),
+						yep : {
+							//assign labeled callbacks for later execution after script loads.
+							//we are on mobile device so load appropriate CSS
+							"jqmcss" : "css/jquery.mobile-1.1.0.min.css",
+							// For minification, uncomment this line
+							//"mcss": "css/m.screen.min.css"
+							// For minification, comment out this line
+							"mcss" : "css/m.screen.css"
+						},
+						nope : {
+							//we are on desktop
+							// For minification, uncomment this line
+							//"scss": "css/d.screen.min.css"
+							// For minification, comment out this line
+							"scss" : "css/d.screen.css"
+						},
+						callback : {
+							//use the labeled callbacks from above, and load jQuery Mobile
+							"jqmcss" : function(url, result, key) {
+								yepnope({
+									load : "http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js",
+									complete : function() {
+										if (!$.mobile) {
+											yepnope
+													.injectJs("js/libs/jquery.mobile-1.1.0.min.js");
+										}
+									}
+								});
+							},
+							"scss" : function(url, result, key) {
+								$(document).ready(function() {
+									//here we are moving content around based on the browser/device.
+									$("aside").insertAfter($("section"));
+								});
+							}
+						},
+						complete : function() {
+							$(document)
+									.ready(
+											function() {
+												//setup the app after all scripts have loaded
+
+												$("#container").show();
+												//Fetches the initial member data and populates the table using jquery templates
+												getMemberTemplate();
+												// getCdTemplate();
+
+												//Register an event listener on the sumbit action
+												$('#reg')
+														.submit(
+																function(event) {
+																	event
+																			.preventDefault();
+
+																	//var userName = localStorage.getItem("currentUserName");
+																	//alert(userName);
+
+																	var taskData = {
+																		"task" : document
+																				.getElementById("task").value,
+																		"username" : localStorage
+																				.getItem("currentUserName")
+																	};
+
+																	createTask(taskData);
+
+																});
+
+												//Register the cancel listener
+												$('#cancel').click(
+														function(event) {
+															//clear input fields
+															$('#reg')[0]
+																	.reset();
+
+															//clear existing msgs
+															$('span.invalid')
+																	.remove();
+															$('span.success')
+																	.remove();
+														});
+
+												$(
+														"#refreshButtonD, #refreshButtonM")
+														.click(
+																function(event) {
+																	updateMemberTable();
+																	updateCdTable();
+																});
+
+												//Clear member registration and error messages on page change
+												$("#container").delegate(
+														"#register-art",
+														"pagebeforeshow",
+														function(event) {
+															$("#formMsgs")
+																	.empty();
+															$('span.invalid')
+																	.remove();
+														});
+											});
+
+							$.fn.serializeObject = function() {
+								var o = {};
+								var a = this.serializeArray();
+								$.each(a, function() {
+									if (o[this.name]) {
+										if (!o[this.name].push) {
+											o[this.name] = [ o[this.name] ];
+										}
+										o[this.name].push(this.value || '');
+									} else {
+										o[this.name] = this.value || '';
+									}
+								});
+								return o;
+							};
+						}
+					} ]);
+</script>
+</head>
+<body onload="checkUser()">
+	<div id="main-container">
+
+		<!-- /Header -->
+
+		<div id="ctask-container">
+
+			<!-- For now mapping bean validation constraints from server side model is a manual task -->
+			<center>
+				<h1>To Do List</h1>
+			</center>
+			<center>
+				<button class="button" onclick="logout()"">Logout</button>
+			</center>
+			<br>
+
+			<form name="reg" id="reg" data-ajax="false" class="hidden-container">
+				<center>
+					<fieldset>
+						<legend>Add item to your list</legend>
+						<div>
+							<label for="name">Task:</label> <input type="text" name="task"
+								id="task" placeholder="Add Item Here" required autofocus />
+						</div>
+						<br>
+						<div data-role="controlgroup" data-type="horizontal">
+							<input class="button" type="submit" id="register"
+								value="Register" /> <input class="button" type="button"
+								name="cancel" id="cancel" value="Clear" />
+						</div>
+
+						<div id="formMsgs"></div>
+
+					</fieldset>
+				</center>
+			</form>
+
+
+			<form name="reg" id="reg" data-ajax="false" class="hidden">
+				<center>
+					<fieldset>
+						<legend>Edit selected Task</legend>
+						<div>
+							<label for="name">Task:</label> <input type="text" name="task"
+								id="task" placeholder="Add Item Here" required autofocus />
+						</div>
+						<br>
+						<div data-role="controlgroup" data-type="horizontal">
+							<input class="button" type="submit" id="register"
+								value="Register" /> <input class="button" type="button"
+								name="cancel" id="cancel" value="Clear" />
+						</div>
+
+						<div id="formMsgs"></div>
+
+					</fieldset>
+				</center>
+			</form>
+
+
+
+
+		</div>
+		<div id="task-container">
+			<center>
+				<fieldset>
+					<legend>Current Tasks</legend>
+					<div id="members"></div>
+				</fieldset>
+
+			</center>
+
+
+		</div>
+	</div>
+
+	<div id="openModal" class="modalDialog">
+
+
+		<div>
+			<h1>Edit Task</h1>
+
+			<form name="reg1" id="reg1" >
+	 		Edit Task: <input type="text" name="task1" id="task1" required>						
+				
+			<input type="button" value="Submit" onclick="submitEdit(document.getElementById('task1').value);" >
+
+			</form>
+				
+
+			<a href="#close" title="Close" class="close"><button>Close</button></a>
+
+
+		</div>
+	</div>
+
+
+
+</body>
+</html>

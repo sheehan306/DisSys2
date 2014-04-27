@@ -1,0 +1,25 @@
+<script type="text/template" id="task-tmpl">
+<% var addHeader = true;
+_.each(obj, function(obj) { 
+    if ( Modernizr.mq( "only all and (max-width: 640px)" ) ) {
+        addHeader = true;
+    }
+    %>
+	
+	<% if ( addHeader ) { %><thead>
+								<tr>
+									  <th>To Do List</th>
+									  <th>Edit</th>
+									  <th>Delete</th>
+									  
+								</tr>
+							</thead>
+							<tbody><% } %>
+								<tr>
+									<td><%=obj.task%></td>
+									<td><button onclick="editTask(<%=obj.id%>,'<%=obj.task%>' )">Edit</a></button></td>
+									<td><button onclick="deleteTask(<%=obj.id%>)">Delete Task</button></td>
+								</tr>	
+<% addHeader = false;
+}); %>
+</script>
