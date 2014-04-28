@@ -122,7 +122,7 @@ function createTask(taskData) {
             //mark success on the registration form
             $('#formMsgs').append($('<span class="success">Member Added</span>'));
 
-            updateMemberTable();
+            updateTaskTable();
             
             $('span.invalid').remove();
             $('span.success').remove();
@@ -145,29 +145,29 @@ function createTask(taskData) {
 }
 
 /* Get the member template */
-function getMemberTemplate() {
+function getTaskTemplate() {
     $.ajax({
         url: "tmpl/task.tmpl",
         dataType: "html",
         success: function( data ) {
             $( "head" ).append( data );
-            updateMemberTable();
+            updateTaskTable();
         }
     });
 }
 
 /* Builds the updated table for the member list */
-function buildMemberRows(obj) {
+function buildTaskRows(obj) {
     return _.template( $( "#task-tmpl" ).html(), {"obj": obj});
 }
 
 /* Uses JAX-RS GET to retrieve current member list */
-function updateMemberTable() {
+function updateTaskTable() {
     $.ajax({
         url: "rest/tasks/"+localStorage.getItem("currentUserName"),
         cache: false,
         success: function(data) {
-            $('#members').empty().append(buildMemberRows(data));
+            $('#members').empty().append(buildTaskRows(data));
         },
         error: function(error) {
             //console.log("error updating table -" + error.status);
@@ -197,7 +197,7 @@ function deleteTask(taskId) {
             //mark success on the registration form
             //$('#formMsgs').append($('<span class="success">Member Added</span>'));
 
-            updateMemberTable();
+            updateTaskTable();
         },
         error: function(error) {
         	console.log("Delete Error");
@@ -240,7 +240,7 @@ function submitEdit(task) {
 	            document.location.href = '#close';
 	        	console.log("Task Edited");
 
-	            updateMemberTable();
+	            updateTaskTable();
 	        },
 	        error: function(error) {
 	        	console.log("Edit Error");

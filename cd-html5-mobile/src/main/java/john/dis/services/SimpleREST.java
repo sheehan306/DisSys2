@@ -1,4 +1,4 @@
-package cia.group6.services;
+package john.dis.services;
 
 import javax.ejb.Stateless;
 import javax.ws.rs.GET;

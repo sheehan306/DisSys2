@@ -1,6 +1,4 @@
-package cia.group6.repositories;
-
-import cia.group6.entities.User;
+package john.dis.repositories;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -15,6 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+import john.dis.entities.User;
 
 @ApplicationScoped
 public class MemberRepository {

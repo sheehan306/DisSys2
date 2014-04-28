@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cia.group6.resources;
+package john.dis.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

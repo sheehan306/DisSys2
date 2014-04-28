@@ -1,6 +1,4 @@
-package cia.group6.repositories;
-
-import cia.group6.entities.Listitems;
+package john.dis.repositories;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import john.dis.entities.Listitems;
 
 @ApplicationScoped
 public class TaskRepository {

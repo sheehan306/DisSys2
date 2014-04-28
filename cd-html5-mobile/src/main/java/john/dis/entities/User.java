@@ -1,4 +1,4 @@
-package cia.group6.entities;
+package john.dis.entities;
 
 import java.io.Serializable;
 import java.util.List;

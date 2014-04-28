@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cia.group6.all.services;
+package john.dis.all.services;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,6 @@ import java.util.logging.Logger;
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
@@ -37,24 +35,22 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import cia.group6.entities.User;
-import cia.group6.registration.MemberRegistration;
-import cia.group6.repositories.MemberRepository;
+import john.dis.entities.Listitems;
+import john.dis.registration.TaskRegistration;
+import john.dis.repositories.TaskRepository;
 
 /**
  * JAX-RS Example
  * <p/>
  * This class produces a RESTful service to read/write the contents of the members table.
  */
-@Path("/members")
+@Path("/tasks")
 @RequestScoped
 @Stateful
-public class MemberService {
+public class TaskService {
     @Inject
     private Logger log;
 
@@ -62,16 +58,32 @@ public class MemberService {
     private Validator validator;
 
     @Inject
-    private MemberRepository repository;
+    private TaskRepository repository;
 
     @Inject
-    MemberRegistration registration;
+    TaskRegistration registration;
 
     @GET
-    @Path("/login")
+    @Path("/{username}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String[] lookupMemberByNameAndPass(@QueryParam("name") String name,@QueryParam("password") String password) {
-        return repository.getUserByNameAndPass(name,password);
+    public List <Listitems> listAllMembers(@PathParam("username") String username ) {
+        return repository.findByName(username);
+    }
+    
+
+    @GET
+    @Path("/deleteTask/{taskId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void deleteTask(@PathParam("taskId") int taskId) {
+         repository.deleteTask(taskId);
+    }
+    
+    
+    @GET
+    @Path("/editTask/{task}/{taskID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void deleteTask(@PathParam("taskID") int taskId, @PathParam("task") String task) {
+         repository.editItem(taskId, task);;
     }
     /**
      * Creates a new member from the values provided.  Performs validation, and will return a JAX-RS response with either
@@ -80,16 +92,15 @@ public class MemberService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createMember(User user) {
+    public Response createMember(Listitems listitem) {
         Response.ResponseBuilder builder = null;
 
        // System.out.print("Hello");
         
         try {
-            //Validates member using bean validation
-            validateMember(user);
 
-            registration.register(user);
+
+            registration.register(listitem);
 
             //Create an "ok" response
             builder = Response.ok();
@@ -112,31 +123,7 @@ public class MemberService {
     }
 
 
-    /**
-     * <p>Validates the given Member variable and throws validation exceptions based on the type of error.
-     * If the error is standard bean validation errors then it will throw a ConstraintValidationException
-     * with the set of the constraints violated.</p>
-     * <p>If the error is caused because an existing member with the same email is registered it throws a regular
-     * validation exception so that it can be interpreted separately.</p>
-     *
-     * @param member Member to be validated
-     * @throws ConstraintViolationException If Bean Validation errors exist
-     * @throws ValidationException          If member with the same email already exists
-     */
-    private void validateMember(User user) throws ConstraintViolationException, ValidationException {
-        //Create a bean validator and check for issues.
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-
-        if (!violations.isEmpty()) {
-            throw new ConstraintViolationException(new HashSet<ConstraintViolation<?>>(violations));
-        }
-
-        //Check the uniqueness of the email address
-        if (userAlreadyExists(user.getUsername())) {
-            throw new ValidationException("Unique Username Violation");
-        }
-    }
-
+    
     /**
      * Creates a JAX-RS "Bad Request" response including a map of all violation fields, and their message.
      * This can then be used by clients to show violations.
@@ -156,20 +143,5 @@ public class MemberService {
         return Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
     }
 
-    /**
-     * Checks if a member with the same email address is already registered.  This is the only way to
-     * easily capture the "@UniqueConstraint(columnNames = "email")" constraint from the Member class.
-     *
-     * @param email The email to check
-     * @return True if the email already exists, and false otherwise
-     */
-    public boolean userAlreadyExists(String name) {
-        User user = null;
-        try {
-            user = repository.findByName(name);
-        } catch (NoResultException e) {
-            // ignore
-        }
-        return user != null;
-    }
+
 }

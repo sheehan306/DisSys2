@@ -1,4 +1,4 @@
-package cia.group6.repositories;
+package john.dis.repositories;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

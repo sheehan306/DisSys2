@@ -25,8 +25,8 @@
    <persistence-unit name="sprint2">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
       <jta-data-source>java:/mySQL</jta-data-source>
-      <class>cia.group6.entities.Listitems</class>
-      <class>cia.group6.entities.User</class>
+      <class>john.dis.entities.Listitems</class>
+      <class>john.dis.entities.User</class>
       <properties>
          <property name="hibernate.hbm2ddl.auto" value="update" />
          <property name="hibernate.show_sql" value="true" />

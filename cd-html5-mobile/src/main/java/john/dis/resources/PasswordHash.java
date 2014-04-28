@@ -1,4 +1,4 @@
-package cia.group6.resources;
+package john.dis.resources;
 
 /* 
  * Password Hashing With PBKDF2 (http://crackstation.net/hashing-security.htm).

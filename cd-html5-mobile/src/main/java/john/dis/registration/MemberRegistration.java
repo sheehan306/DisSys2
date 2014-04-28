@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cia.group6.registration;
-
-import cia.group6.entities.Listitems;
+package john.dis.registration;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
@@ -25,9 +23,11 @@ import javax.persistence.EntityManager;
 
 import java.util.logging.Logger;
 
+import john.dis.entities.User;
+
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateless
-public class TaskRegistration {
+public class MemberRegistration {
 
     @Inject
     private Logger log;
@@ -36,11 +36,11 @@ public class TaskRegistration {
     private EntityManager em;
 
     @Inject
-    private Event<Listitems> taskEventSrc;
+    private Event<User> memberEventSrc;
 
-    public void register(Listitems task) throws Exception {
-        log.info("Registering " + task.getTask());
-        em.persist(task);
-        taskEventSrc.fire(task);
+    public void register(User user) throws Exception {
+        log.info("Registering " + user.getUsername());
+        em.persist(user);
+        memberEventSrc.fire(user);
     }
 }

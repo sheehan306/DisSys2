@@ -99,7 +99,7 @@
 
 												$("#container").show();
 												//Fetches the initial member data and populates the table using jquery templates
-												getMemberTemplate();
+												getTaskTemplate();
 												// getCdTemplate();
 
 												//Register an event listener on the sumbit action
@@ -141,8 +141,8 @@
 														"#refreshButtonD, #refreshButtonM")
 														.click(
 																function(event) {
-																	updateMemberTable();
-																	updateCdTable();
+																	updateTaskTable();
+																	
 																});
 
 												//Clear member registration and error messages on page change
@@ -225,7 +225,7 @@
 						<br>
 						<div data-role="controlgroup" data-type="horizontal">
 							<input class="button" type="submit" id="register"
-								value="Register" /> <input class="button" type="button"
+								value="Add Task" /> <input class="button" type="button"
 								name="cancel" id="cancel" value="Clear" />
 						</div>
 
